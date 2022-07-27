@@ -21,6 +21,7 @@ RCT_EXPORT_METHOD(initWithAppId:(NSString *)appid) {
         return;
     }
     [QQApiManager sharedManager].delegate = self;
+    [TencentOAuth setIsUserAgreedAuthorization:YES];
     mTencent = [[TencentOAuth alloc] initWithAppId:appid andDelegate:self];
     #if DEBUG
     [QQApiInterface startLogWithBlock:^(NSString *logStr) {
