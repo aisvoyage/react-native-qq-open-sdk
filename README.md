@@ -9,7 +9,7 @@ iOS如果报错包含 Undefined symbols for architecture x86_64:
 
 `$ yarn add @byron-react-native/qqopensdk`
 
-### iOS
+### iOS(iOS_SDK_V3.5.11)
 
 ```javascript
 // （1）配置URL Scheme
@@ -57,7 +57,7 @@ iOS如果报错包含 Undefined symbols for architecture x86_64:
 
 ```
 
-### Android
+### Android(Android_SDK_V3.5.12)
 ```javascript
 // app/build.gradle add
 android {
