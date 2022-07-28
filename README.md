@@ -1,5 +1,9 @@
 # react-native-qq-open-sdk
-  *暂时不建议使用，目前只做了登录
+  *暂时不建议使用，目前只做了登录<br>
+
+iOS如果报错包含 Undefined symbols for architecture x86_64:
+  "_SCNetworkReachabilitySetCallback", referenced from
+则需要添加 SystemConfiguration.framework 到 Link Binary With Libraries
 
 ## Getting started
 
