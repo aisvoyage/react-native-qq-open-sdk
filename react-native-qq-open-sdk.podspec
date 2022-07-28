@@ -23,7 +23,7 @@ Pod::Spec.new do |s|
   s.source_files = "ios/**/*.{h,c,cc,cpp,m,mm,swift}"
   s.requires_arc = true
   # s.resources = ['ios/TencentOpenApi_IOS_Bundle.bundle'] # 从sdk3.3.5版本开始，此文件可以不要了
-  s.vendored_frameworks = "TencentOpenAPI.framework"
+  s.vendored_frameworks = "TencentOpenAPI.framework" # iOS_SDK_V3.5.11
   s.dependency "React"
   # ...
   # s.dependency "..."
