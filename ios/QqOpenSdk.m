@@ -44,6 +44,12 @@ RCT_EXPORT_METHOD(authorize:(NSArray *)permissions resolve:(RCTPromiseResolveBlo
     resolve(@([mTencent authorize:permissions]));
 }
 
+RCT_EXPORT_METHOD(shareToQQ:(NSDictionary *)data resolve:(RCTPromiseResolveBlock)resolve
+                  rejecter:(RCTPromiseRejectBlock)reject)
+{
+    [self _shareToQQWithData:data scene:0 resolve:resolve reject:reject];
+}
+
 RCT_EXPORT_METHOD(incrAuthWithPermissions:(NSArray *)permissions resolve:(RCTPromiseResolveBlock)resolve
                   rejecter:(RCTPromiseRejectBlock)reject) {
     if (mTencent == nil) {
@@ -68,6 +74,15 @@ RCT_EXPORT_METHOD(logout) {
     }
     [mTencent logout:self];
     mTencent = nil;
+}
+
+- (void)_shareToQQWithData:(NSDictionary *)aData scene:(int)aScene resolve:(RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock)reject{
+    //开发者分享的文本内容
+    QQApiTextObject *txtObj = [QQApiTextObject objectWithText:@"text"];
+    SendMessageToQQReq *req = [SendMessageToQQReq reqWithContent:txtObj];
+    //将内容分享到
+    qqQQApiSendResultCode sent = [QQApiInterface sendReq:req];
+    resolve(@[[NSNull null]]);
 }
 
 #pragma mark - TencentLoginDelegate(授权登录回调协议)

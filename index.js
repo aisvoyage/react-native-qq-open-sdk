@@ -36,4 +36,8 @@ export default class QQOpenSDK {
   static logout = () => {
     return QqOpenSdk.logout();
   };
+
+  static shareToQQ = async (data) => {
+    return QqOpenSdk.shareToQQ(data);
+  }
 }

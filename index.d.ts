@@ -7,6 +7,29 @@ declare module "@byron-react-native/qqopensdk" {
     openId: string;
     unionid: string;
   }
+
+  export type QQLibShareType = 'news' | 'text' | 'image';
+
+  export interface QQLibSharePropTypes {
+    type: QQLibShareType,
+  }
+
+  export interface QQLibShareNewsPropTypes extends QQLibSharePropTypes {
+    title: string,
+    description: string,
+    webpageUrl: string,
+    imageUrl: string,
+  }
+
+  export interface QQLibShareTextPropTypes extends QQLibSharePropTypes {
+    text: string,
+  }
+
+  export interface QQLibShareImagePropTypes extends QQLibSharePropTypes {
+    imageUrl: string,
+    imageLocalUrl: string,
+  }
+
   class QQOpenSDK {
     /**
      * 初始化TencentOAuth对象
@@ -40,6 +63,8 @@ declare module "@byron-react-native/qqopensdk" {
      * 退出登录(退出登录后，TecentOAuth失效，需要重新初始化)
      */
     static logout(): void;
+
+    static shareToQQ(data:QQLibSharePropTypes):Promise<any>;
   }
   export default QQOpenSDK;
 }
