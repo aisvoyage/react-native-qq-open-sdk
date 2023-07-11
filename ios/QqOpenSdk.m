@@ -81,7 +81,7 @@ RCT_EXPORT_METHOD(logout) {
     QQApiTextObject *txtObj = [QQApiTextObject objectWithText:@"text"];
     SendMessageToQQReq *req = [SendMessageToQQReq reqWithContent:txtObj];
     //将内容分享到
-    qqQQApiSendResultCode sent = [QQApiInterface sendReq:req];
+    QQApiSendResultCode sent = [QQApiInterface sendReq:req];
     resolve(@[[NSNull null]]);
 }
 
