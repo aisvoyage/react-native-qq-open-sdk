@@ -37,7 +37,32 @@ export default class QQOpenSDK {
     return QqOpenSdk.logout();
   };
 
-  static shareToQQ = async (data) => {
-    return QqOpenSdk.shareToQQ(data);
+  static shareTextToQQ = async (text='') => {
+    return  new Promise((resolve, reject) => {
+      if(!text){
+        reject('share text to qq cannot be empty')
+      }
+      return QqOpenSdk.shareToQQ({type:'text',text});
+    })
+  }
+
+  /**
+   *
+   * @param imageLocalUrl 本地图片路径 形如：file://
+   * @param title
+   * @param description
+   * @returns {Promise<unknown>}
+   */
+  static shareImageToQQ = async (imageLocalUrl = '', title, description) => {
+    return new Promise((resolve, reject) => {
+      if (!imageLocalUrl) {
+        reject('share image local url cannot be empty');
+      }
+      return QqOpenSdk.shareToQQ({ type: 'image', imageUrl: imageLocalUrl, title, description });
+    });
+  };
+
+  static shareNewsToQQ = async (data) => {
+
   }
 }

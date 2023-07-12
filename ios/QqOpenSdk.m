@@ -44,12 +44,6 @@ RCT_EXPORT_METHOD(authorize:(NSArray *)permissions resolve:(RCTPromiseResolveBlo
     resolve(@([mTencent authorize:permissions]));
 }
 
-RCT_EXPORT_METHOD(shareToQQ:(NSDictionary *)data resolve:(RCTPromiseResolveBlock)resolve
-                  rejecter:(RCTPromiseRejectBlock)reject)
-{
-    [self _shareToQQWithData:data scene:0 resolve:resolve reject:reject];
-}
-
 RCT_EXPORT_METHOD(incrAuthWithPermissions:(NSArray *)permissions resolve:(RCTPromiseResolveBlock)resolve
                   rejecter:(RCTPromiseRejectBlock)reject) {
     if (mTencent == nil) {
@@ -76,13 +70,98 @@ RCT_EXPORT_METHOD(logout) {
     mTencent = nil;
 }
 
-- (void)_shareToQQWithData:(NSDictionary *)aData scene:(int)aScene resolve:(RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock)reject{
-    //开发者分享的文本内容
-    QQApiTextObject *txtObj = [QQApiTextObject objectWithText:@"text"];
-    SendMessageToQQReq *req = [SendMessageToQQReq reqWithContent:txtObj];
-    //将内容分享到
-    QQApiSendResultCode sent = [QQApiInterface sendReq:req];
-    resolve(@[[NSNull null]]);
+RCT_EXPORT_METHOD(shareToQQ:(NSDictionary *)data resolve:(RCTPromiseResolveBlock)resolve
+                  rejecter:(RCTPromiseRejectBlock)reject)
+{
+    [self _shareToQQWithData:data resolve:resolve reject:reject];
+}
+
+#pragma mark
+
+- (void)_shareToQQWithData:(NSDictionary *)aData resolve:(RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock)reject{
+
+    NSString *type = aData[@"type"]
+    QQApiObject *content = nil;
+    if ([type isEqualToString: @"text"]) {
+        NSString *text = aData[@"text"]
+        content = [QQApiTextObject objectWithText:text];
+    }
+    else if ([type isEqualToString: @"image"]) {
+       NSString *imageUrl = aData[@"imageUrl"];
+        if (imageUrl.length) {
+            CGSize size = CGSizeZero;
+            UIImage *image = [UIImage imageWithContentsOfFile:imageUrl];
+            NSString *title = aData[@"title"]
+            NSString *description = aData[@"description"]
+            NSData *imgData = UIImageJPEGRepresentation(image, 1);
+
+            // 图片大小如果大于5M就进行压缩
+            if(imgData.length >= 5242880) {
+                imgData =[self compressImage: image toByte: 55242880]
+            }
+
+            content = [QQApiImageObject objectWithData:imgData
+                                      previewImageData:imgData
+                                                 title:title? :@""
+                                           description:description? :@""];
+        }
+    }
+    else if ([type isEqualToString: @"news"]) {
+
+    }
+
+    if (content != nil) {
+        SendMessageToQQReq *req = [SendMessageToQQReq reqWithContent:content];
+        QQApiSendResultCode sent = [QQApiInterface sendReq:req];
+        resolve(@[[NSNull null]]);
+    }
+    else {
+        reject(@"empty content",INVOKE_FAILED,nil);
+    }
+}
+
+// 压缩图片
+- (NSData *)compressImage:(UIImage *)image toByte:(NSUInteger)maxLength {
+    // Compress by quality
+    CGFloat compression = 1;
+    NSData *data = UIImageJPEGRepresentation(image, compression);
+    if (data.length < maxLength) return data;
+
+    CGFloat max = 1;
+    CGFloat min = 0;
+    for (int i = 0; i < 6; ++i) {
+        compression = (max + min) / 2;
+        data = UIImageJPEGRepresentation(image, compression);
+        if (data.length < maxLength * 0.9) {
+            min = compression;
+        } else if (data.length > maxLength) {
+            max = compression;
+        } else {
+            break;
+        }
+    }
+    UIImage *resultImage = [UIImage imageWithData:data];
+    if (data.length < maxLength) return data;
+
+    // Compress by size
+    NSUInteger lastDataLength = 0;
+    while (data.length > maxLength && data.length != lastDataLength) {
+        lastDataLength = data.length;
+        CGFloat ratio = (CGFloat)maxLength / data.length;
+        CGSize size = CGSizeMake((NSUInteger)(resultImage.size.width * sqrtf(ratio)),
+                                 (NSUInteger)(resultImage.size.height * sqrtf(ratio))); // Use NSUInteger to prevent white blank
+        UIGraphicsBeginImageContext(size);
+        [resultImage drawInRect:CGRectMake(0, 0, size.width, size.height)];
+        resultImage = UIGraphicsGetImageFromCurrentImageContext();
+        UIGraphicsEndImageContext();
+        data = UIImageJPEGRepresentation(resultImage, compression);
+    }
+
+    if (data.length > maxLength) {
+        return [self compressImage:resultImage toByte:maxLength];
+    }
+
+    return data;
 }
 
 #pragma mark - TencentLoginDelegate(授权登录回调协议)

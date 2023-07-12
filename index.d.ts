@@ -8,28 +8,6 @@ declare module "@byron-react-native/qqopensdk" {
     unionid: string;
   }
 
-  export type QQLibShareType = 'news' | 'text' | 'image';
-
-  export interface QQLibSharePropTypes {
-    type: QQLibShareType,
-  }
-
-  export interface QQLibShareNewsPropTypes extends QQLibSharePropTypes {
-    title: string,
-    description: string,
-    webpageUrl: string,
-    imageUrl: string,
-  }
-
-  export interface QQLibShareTextPropTypes extends QQLibSharePropTypes {
-    text: string,
-  }
-
-  export interface QQLibShareImagePropTypes extends QQLibSharePropTypes {
-    imageUrl: string,
-    imageLocalUrl: string,
-  }
-
   class QQOpenSDK {
     /**
      * 初始化TencentOAuth对象
@@ -64,7 +42,9 @@ declare module "@byron-react-native/qqopensdk" {
      */
     static logout(): void;
 
-    static shareToQQ(data:QQLibSharePropTypes):Promise<any>;
+    static shareTextToQQ(text: string): Promise<any>;
+
+    static shareImageToQQ(imageLocalUrl: string, title?: string, description?: string): Promise<any>;
   }
   export default QQOpenSDK;
 }
