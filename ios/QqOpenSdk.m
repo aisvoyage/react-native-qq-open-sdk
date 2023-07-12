@@ -80,7 +80,7 @@ RCT_EXPORT_METHOD(shareToQQ:(NSDictionary *)data resolve:(RCTPromiseResolveBlock
 
 - (void)_shareToQQWithData:(NSDictionary *)aData resolve:(RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock)reject{
 
-    NSString *type = aData[@"type"]
+    NSString *type = aData[@"type"];
     QQApiObject *content = nil;
     if ([type isEqualToString: @"text"]) {
         NSString *text = aData[@"text"];
