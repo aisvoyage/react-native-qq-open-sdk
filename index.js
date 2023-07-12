@@ -37,6 +37,10 @@ export default class QQOpenSDK {
     return QqOpenSdk.logout();
   };
 
+  /**
+   * 分享纯文本到qq好友
+   * @param text
+   */
   static shareTextToQQ = async (text='') => {
     return  new Promise((resolve, reject) => {
       if(!text){
@@ -47,22 +51,38 @@ export default class QQOpenSDK {
   }
 
   /**
-   *
-   * @param imageLocalUrl 本地图片路径 形如：file://
-   * @param title
-   * @param description
-   * @returns {Promise<unknown>}
+   * 分享纯图片到qq好友 图片大小要求在5M以下 sdk会对大于5M的图片进行压缩但不能保证成功
+   * @param imageLocalUrl 本地图片路径 形如：/var/mobile/Containers/Data/Application/AD2FDFBB-6A91-4E3B-8761-3F657A78D507/Library/Caches/ImagePicker/BB1B87D8-5C1E-4C4B-9C01-4C20C0444119.jpg
    */
-  static shareImageToQQ = async (imageLocalUrl = '', title, description) => {
+  static shareImageToQQ = async (imageLocalUrl = '') => {
     return new Promise((resolve, reject) => {
       if (!imageLocalUrl) {
         reject('share image local url cannot be empty');
       }
-      return QqOpenSdk.shareToQQ({ type: 'image', imageUrl: imageLocalUrl, title, description });
+      return QqOpenSdk.shareToQQ({ type: 'image', imageUrl: imageLocalUrl });
     });
   };
 
-  static shareNewsToQQ = async (data) => {
-
-  }
+  /**
+   * 分享新闻到qq好友
+   *
+   * @param title 标题 长度(0,128]
+   * @param description 描述内容 长度(0,512]
+   * @param preImage 预览缩略图 preViewImageRemoteUrl 图片大小要求(0,1M]
+   * @param url 点击跳转连接 remoteUrl 长度(0,1024]
+   */
+  static shareNewsToQQ = async (title, description, preImage, url) => {
+    return new Promise((resolve, reject) => {
+      if (title.length === 0 || title.length > 128) {
+        reject('share news title length invalid');
+      }
+      if (description.length === 0 || description.length > 512) {
+        reject('share news description length invalid');
+      }
+      if (url.length === 0 || url.length > 1024) {
+        reject('share news url length invalid');
+      }
+      return QqOpenSdk.shareToQQ({ type: 'news', title, description, preImage, url });
+    });
+  };
 }

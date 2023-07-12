@@ -83,31 +83,35 @@ RCT_EXPORT_METHOD(shareToQQ:(NSDictionary *)data resolve:(RCTPromiseResolveBlock
     NSString *type = aData[@"type"]
     QQApiObject *content = nil;
     if ([type isEqualToString: @"text"]) {
-        NSString *text = aData[@"text"]
+        NSString *text = aData[@"text"];
         content = [QQApiTextObject objectWithText:text];
     }
     else if ([type isEqualToString: @"image"]) {
-       NSString *imageUrl = aData[@"imageUrl"];
-        if (imageUrl.length) {
-            CGSize size = CGSizeZero;
-            UIImage *image = [UIImage imageWithContentsOfFile:imageUrl];
-            NSString *title = aData[@"title"]
-            NSString *description = aData[@"description"]
-            NSData *imgData = UIImageJPEGRepresentation(image, 1);
+        NSString *imageUrl = aData[@"imageUrl"];
+        UIImage *image = [UIImage imageWithContentsOfFile:imageUrl];
+        NSData *imgData = UIImageJPEGRepresentation(image, 1);
 
-            // 图片大小如果大于5M就进行压缩
-            if(imgData.length >= 5242880) {
-                imgData =[self compressImage: image toByte: 55242880]
-            }
-
-            content = [QQApiImageObject objectWithData:imgData
-                                      previewImageData:imgData
-                                                 title:title? :@""
-                                           description:description? :@""];
+        // 图片大小如果大于5M就进行压缩
+        if(imgData.length >= 5242880) {
+            imgData =[self compressImage: image toByte: 55242880];
         }
+
+        content = [QQApiImageObject objectWithData:imgData
+                                  previewImageData:imgData
+                                             title:@"title"
+                                       description :@"description"];
     }
     else if ([type isEqualToString: @"news"]) {
+        NSString *title = aData[@"title"];
+        NSString *description = aData[@"description"];
+        NSString *preImage = aData[@"preImage"];
+        NSString *url = aData[@"url"];
 
+        content = [QQApiNewsObject
+                           objectWithURL:[NSURL URLWithString:url]
+                           title:title
+                           description:description
+                           previewImageURL:[NSURL URLWithString:preImage]];
     }
 
     if (content != nil) {
@@ -116,7 +120,7 @@ RCT_EXPORT_METHOD(shareToQQ:(NSDictionary *)data resolve:(RCTPromiseResolveBlock
         resolve(@[[NSNull null]]);
     }
     else {
-        reject(@"empty content",INVOKE_FAILED,nil);
+        reject(@"-1",@"QQ API invoke returns false.",nil);
     }
 }
 
