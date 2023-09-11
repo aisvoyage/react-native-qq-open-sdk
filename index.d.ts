@@ -43,26 +43,29 @@ declare module "@byron-react-native/qqopensdk" {
     static logout(): void;
 
     /**
-     * 分享纯文本到qq好友
+     * 分享纯文本到qq
      * @param text
+     * @param scene 0为qq 1为qzone
      */
-    static shareTextToQQ(text: string): Promise<any>;
+    static shareTextToQQ(text: string, scene: number): Promise<any>;
 
     /**
-     * 分享纯图片到qq好友 图片大小要求在5M以下 sdk会对大于5M的图片进行压缩但不能保证成功
+     * 分享纯图片到qq 图片大小要求在5M以下 sdk会对大于5M的图片进行压缩但不能保证成功
      * @param imageLocalUrl 本地图片路径 形如：/var/mobile/Containers/Data/Application/AD2FDFBB-6A91-4E3B-8761-3F657A78D507/Library/Caches/ImagePicker/BB1B87D8-5C1E-4C4B-9C01-4C20C0444119.jpg
+     * @param scene 0为qq 1为qzone
      */
-    static shareImageToQQ(imageLocalUrl: string): Promise<any>;
+    static shareImageToQQ(imageLocalUrl: string, scene: number): Promise<any>;
 
     /**
-     * 分享新闻到qq好友
+     * 分享新闻到qq
      *
      * @param title 标题 长度(0,128]
      * @param description 描述内容 长度(0,512]
      * @param preImage 预览缩略图 preViewImageRemoteUrl 图片大小要求(0,1M]
      * @param url 点击跳转连接 remoteUrl 长度(0,1024]
+     * @param scene 0为qq 1为qzone
      */
-    static shareNewsToQQ(title: string, description: string, preImage: string, url: string): Promise<any>;
+    static shareNewsToQQ(title: string, description: string, preImage: string, url: string, scene: number): Promise<any>;
   }
   export default QQOpenSDK;
 }

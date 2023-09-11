@@ -76,6 +76,12 @@ RCT_EXPORT_METHOD(shareToQQ:(NSDictionary *)data resolve:(RCTPromiseResolveBlock
     [self _shareToQQWithData:data resolve:resolve reject:reject];
 }
 
+RCT_EXPORT_METHOD(shareToQZone:(NSDictionary *)data resolve:(RCTPromiseResolveBlock)resolve
+                  rejecter:(RCTPromiseRejectBlock)reject)
+{
+    [self _shareToQZone:data resolve:resolve reject:reject];
+}
+
 #pragma mark
 
 - (void)_shareToQQWithData:(NSDictionary *)aData resolve:(RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock)reject{
@@ -117,6 +123,52 @@ RCT_EXPORT_METHOD(shareToQQ:(NSDictionary *)data resolve:(RCTPromiseResolveBlock
     if (content != nil) {
         SendMessageToQQReq *req = [SendMessageToQQReq reqWithContent:content];
         QQApiSendResultCode sent = [QQApiInterface sendReq:req];
+        resolve(@[[NSNull null]]);
+    }
+    else {
+        reject(@"-1",@"QQ API invoke returns false.",nil);
+    }
+}
+
+- (void)_shareToQZone:(NSDictionary *)aData resolve:(RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock)reject{
+
+    NSString *type = aData[@"type"];
+    QQApiObject *content = nil;
+    if ([type isEqualToString: @"text"]) {
+        NSString *text = aData[@"text"];
+        content = [QQApiTextObject objectWithText:text];
+    }
+    else if ([type isEqualToString: @"image"]) {
+        NSString *imageUrl = aData[@"imageUrl"];
+        UIImage *image = [UIImage imageWithContentsOfFile:imageUrl];
+        NSData *imgData = UIImageJPEGRepresentation(image, 1);
+
+        // 图片大小如果大于5M就进行压缩
+        if(imgData.length >= 5242880) {
+            imgData =[self compressImage: image toByte: 55242880];
+        }
+
+        content = [QQApiImageObject objectWithData:imgData
+                                  previewImageData:imgData
+                                             title:@"title"
+                                       description :@"description"];
+    }
+    else if ([type isEqualToString: @"news"]) {
+        NSString *title = aData[@"title"];
+        NSString *description = aData[@"description"];
+        NSString *preImage = aData[@"preImage"];
+        NSString *url = aData[@"url"];
+
+        content = [QQApiNewsObject
+                           objectWithURL:[NSURL URLWithString:url]
+                           title:title
+                           description:description
+                           previewImageURL:[NSURL URLWithString:preImage]];
+    }
+
+    if (content != nil) {
+        SendMessageToQQReq *req = [SendMessageToQQReq reqWithContent:content];
+        QQApiSendResultCode sent = [QQApiInterface SendReqToQZone:req];
         resolve(@[[NSNull null]]);
     }
     else {
