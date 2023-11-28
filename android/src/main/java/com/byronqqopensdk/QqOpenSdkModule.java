@@ -41,7 +41,7 @@ import org.json.JSONObject;
 
 import java.util.Date;
 
-public class QqOpenSdkModule extends ReactContextBaseJavaModule implements IUiListener, ActivityEventListener {
+public class QqOpenSdkModule extends ReactContextBaseJavaModule implements ActivityEventListener {
 
     private final ReactApplicationContext reactContext;
     public DeviceEventManagerModule.RCTDeviceEventEmitter eventEmitter;
@@ -414,7 +414,7 @@ public class QqOpenSdkModule extends ReactContextBaseJavaModule implements IUiLi
                         "access_token",
                         obj.getString(Constants.PARAM_ACCESS_TOKEN)
                 );
-                resultMap.putString("oauth_consumer_key", this.appId);
+                resultMap.putString("oauth_consumer_key", appId);
                 resultMap.putDouble(
                         "expires_in",
                         (new Date().getTime() + obj.getLong(Constants.PARAM_EXPIRES_IN))
