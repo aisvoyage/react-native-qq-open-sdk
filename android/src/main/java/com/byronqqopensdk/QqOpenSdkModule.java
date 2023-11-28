@@ -41,7 +41,7 @@ import org.json.JSONObject;
 
 import java.util.Date;
 
-public class QqOpenSdkModule extends ReactContextBaseJavaModule implements ActivityEventListener {
+public class QqOpenSdkModule extends ReactContextBaseJavaModule implements IUiListener, ActivityEventListener {
 
     private final ReactApplicationContext reactContext;
     public DeviceEventManagerModule.RCTDeviceEventEmitter eventEmitter;
