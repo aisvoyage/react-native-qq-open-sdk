@@ -47,6 +47,7 @@ public class QqOpenSdkModule extends ReactContextBaseJavaModule implements IUiLi
     public DeviceEventManagerModule.RCTDeviceEventEmitter eventEmitter;
     private Tencent mTencent;
 
+    private String appId;
     private static final String NOT_INIT = "initApp required";
     private static final String RCTQQShareTypeNews = "news";
     private static final String RCTQQShareTypeImage = "image";
@@ -84,6 +85,7 @@ public class QqOpenSdkModule extends ReactContextBaseJavaModule implements IUiLi
         Tencent.setIsPermissionGranted(true);
         mTencent = Tencent.createInstance(appId, reactContext);
         eventEmitter = reactContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class);
+        this.appId = appId;
     }
 
     @ReactMethod
@@ -274,14 +276,14 @@ public class QqOpenSdkModule extends ReactContextBaseJavaModule implements IUiLi
                     QQShare.SHARE_TO_QQ_EXT_INT,
                     QQShare.SHARE_TO_QQ_FLAG_QZONE_ITEM_HIDE
             );
-            mTencent.shareToQQ(getCurrentActivity(), bundle, this);
+            mTencent.shareToQQ(getCurrentActivity(), bundle, shareListener);
         } else if (scene == 1) {
             // Share to Qzone.
             bundle.putInt(
                     QQShare.SHARE_TO_QQ_EXT_INT,
                     QQShare.SHARE_TO_QQ_FLAG_QZONE_AUTO_OPEN
             );
-            mTencent.shareToQQ(getCurrentActivity(), bundle, this);
+            mTencent.shareToQQ(getCurrentActivity(), bundle, shareListener);
         }
     }
 
@@ -399,8 +401,60 @@ public class QqOpenSdkModule extends ReactContextBaseJavaModule implements IUiLi
         return "com.google.android.apps.photos.content".equals(uri.getAuthority());
     }
 
-    @Override
-    public void onWarning(int i) {}
+    private final IUiListener shareListener = new IUiListener() {
+        @Override
+        public void onComplete(Object o) {
+            WritableMap resultMap = Arguments.createMap();
+            resultMap.putString("type", "QQAuthorizeResponse");
+            try {
+                JSONObject obj = (JSONObject) (o);
+                resultMap.putInt("errCode", 0);
+                resultMap.putString("openid", obj.getString(Constants.PARAM_OPEN_ID));
+                resultMap.putString(
+                        "access_token",
+                        obj.getString(Constants.PARAM_ACCESS_TOKEN)
+                );
+                resultMap.putString("oauth_consumer_key", this.appId);
+                resultMap.putDouble(
+                        "expires_in",
+                        (new Date().getTime() + obj.getLong(Constants.PARAM_EXPIRES_IN))
+                );
+            } catch (Exception e) {
+                WritableMap map = Arguments.createMap();
+                map.putInt("errCode", Constants.ERROR_UNKNOWN);
+                map.putString("errMsg", e.getLocalizedMessage());
+
+                getReactApplicationContext()
+                        .getJSModule(RCTNativeAppEventEmitter.class)
+                        .emit("QQ_Resp", map);
+            }
+        }
+
+        @Override
+        public void onError(UiError uiError) {
+            WritableMap resultMap = Arguments.createMap();
+            resultMap.putInt("errCode", SHARE_RESULT_CODE_FAILED);
+            resultMap.putString("message", "Share failed." + uiError.errorDetail);
+
+            getReactApplicationContext()
+                    .getJSModule(RCTNativeAppEventEmitter.class)
+                    .emit("QQ_Resp", resultMap);
+        }
+
+        @Override
+        public void onCancel() {
+            WritableMap resultMap = Arguments.createMap();
+            resultMap.putInt("errCode", SHARE_RESULT_CODE_CANCEL);
+            resultMap.putString("message", "Share canceled.");
+
+            getReactApplicationContext()
+                    .getJSModule(RCTNativeAppEventEmitter.class)
+                    .emit("QQ_Resp", resultMap);
+        }
+
+        @Override
+        public void onWarning(int i) {}
+    }
 
     @Override
     public void initialize() {
