@@ -454,7 +454,7 @@ public class QqOpenSdkModule extends ReactContextBaseJavaModule implements IUiLi
 
         @Override
         public void onWarning(int i) {}
-    }
+    };
 
     @Override
     public void initialize() {
