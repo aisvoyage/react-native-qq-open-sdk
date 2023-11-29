@@ -410,23 +410,16 @@ public class QqOpenSdkModule extends ReactContextBaseJavaModule implements Activ
                 JSONObject obj = (JSONObject) (o);
                 resultMap.putInt("errCode", 0);
                 resultMap.putString("openid", obj.getString(Constants.PARAM_OPEN_ID));
-                resultMap.putString(
-                        "access_token",
-                        obj.getString(Constants.PARAM_ACCESS_TOKEN)
-                );
+                resultMap.putString("access_token", obj.getString(Constants.PARAM_ACCESS_TOKEN));
                 resultMap.putString("oauth_consumer_key", appId);
-                resultMap.putDouble(
-                        "expires_in",
-                        (new Date().getTime() + obj.getLong(Constants.PARAM_EXPIRES_IN))
-                );
+                resultMap.putDouble("expires_in", (new Date().getTime() + obj.getLong(Constants.PARAM_EXPIRES_IN)));
+                getReactApplicationContext().getJSModule(RCTNativeAppEventEmitter.class).emit("QQ_Resp", resultMap);
             } catch (Exception e) {
                 WritableMap map = Arguments.createMap();
                 map.putInt("errCode", Constants.ERROR_UNKNOWN);
                 map.putString("errMsg", e.getLocalizedMessage());
 
-                getReactApplicationContext()
-                        .getJSModule(RCTNativeAppEventEmitter.class)
-                        .emit("QQ_Resp", map);
+                getReactApplicationContext().getJSModule(RCTNativeAppEventEmitter.class).emit("QQ_Resp", map);
             }
         }
 

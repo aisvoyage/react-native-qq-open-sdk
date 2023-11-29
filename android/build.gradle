@@ -17,5 +17,5 @@ android {
 
 dependencies {
     implementation 'com.facebook.react:react-native:+'
-    implementation files('libs/open_sdk_3.5.12.2_r97423a8_lite.jar')
+    implementation files('libs/open_sdk_3.5.14.4_r377deaa_lite.jar')
 }
