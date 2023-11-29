@@ -144,14 +144,17 @@ public class QqOpenSdkModule extends ReactContextBaseJavaModule implements Activ
             return;
         }
 
-        UiThreadUtil.runOnUiThread(
+        _shareToQQ(data, 0);
+        promise.resolve(true);
+        /*UiThreadUtil.runOnUiThread(
                 new Runnable() {
                     @Override
                     public void run() {
-                        promise.resolve(_shareToQQ(data, 0));
+                        _shareToQQ(data, 0);
+                        promise.resolve(true);
                     }
                 }
-        );
+        );*/
     }
 
     private void _shareToQQ(ReadableMap data, int scene) {
