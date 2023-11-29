@@ -156,6 +156,7 @@ public class QqOpenSdkModule extends ReactContextBaseJavaModule implements Activ
     }
 
     private void _shareToQQ(ReadableMap data, int scene) {
+    Log.e("QQShare==", "进入方法_shareToQQ");
         String type = RCTQQShareTypeNews;
         if (data.hasKey(RCTQQShareType)) {
             type = data.getString(RCTQQShareType);
