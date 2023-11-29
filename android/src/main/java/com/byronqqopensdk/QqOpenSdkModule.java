@@ -45,6 +45,7 @@ public class QqOpenSdkModule extends ReactContextBaseJavaModule implements Activ
 
     private final ReactApplicationContext reactContext;
     public DeviceEventManagerModule.RCTDeviceEventEmitter eventEmitter;
+    public RCTNativeAppEventEmitter appEventEmitter;
     private Tencent mTencent;
 
     private String appId;
@@ -85,6 +86,7 @@ public class QqOpenSdkModule extends ReactContextBaseJavaModule implements Activ
         Tencent.setIsPermissionGranted(true);
         mTencent = Tencent.createInstance(appId, reactContext);
         eventEmitter = reactContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class);
+        appEventEmitter = reactContext.getJSModule(RCTNativeAppEventEmitter.class);
         this.appId = appId;
     }
 
@@ -146,8 +148,7 @@ public class QqOpenSdkModule extends ReactContextBaseJavaModule implements Activ
                 new Runnable() {
                     @Override
                     public void run() {
-                        _shareToQQ(data, 0);
-                        promise.resolve(null);
+                        promise.resolve(_shareToQQ(data, 0));
                     }
                 }
         );
@@ -207,60 +208,36 @@ public class QqOpenSdkModule extends ReactContextBaseJavaModule implements Activ
 
         Bundle bundle = new Bundle();
         if (data.hasKey(RCTQQShareTitle)) {
-            bundle.putString(
-                    QQShare.SHARE_TO_QQ_TITLE,
-                    data.getString(RCTQQShareTitle)
-            );
+            bundle.putString(QQShare.SHARE_TO_QQ_TITLE, data.getString(RCTQQShareTitle));
         }
         if (data.hasKey(RCTQQShareDescription)) {
-            bundle.putString(
-                    QQShare.SHARE_TO_QQ_SUMMARY,
-                    data.getString(RCTQQShareDescription)
-            );
+            bundle.putString(QQShare.SHARE_TO_QQ_SUMMARY, data.getString(RCTQQShareDescription));
         }
         if (data.hasKey(RCTQQShareWebpageUrl)) {
-            bundle.putString(
-                    QQShare.SHARE_TO_QQ_TARGET_URL,
-                    data.getString(RCTQQShareWebpageUrl)
-            );
+            bundle.putString(QQShare.SHARE_TO_QQ_TARGET_URL, data.getString(RCTQQShareWebpageUrl));
         }
         if (data.hasKey(RCTQQShareImageUrl)) {
-            bundle.putString(
-                    QQShare.SHARE_TO_QQ_IMAGE_URL,
-                    data.getString(RCTQQShareImageUrl)
-            );
+            bundle.putString(QQShare.SHARE_TO_QQ_IMAGE_URL, data.getString(RCTQQShareImageUrl));
         }
         if (data.hasKey("appName")) {
             bundle.putString(QQShare.SHARE_TO_QQ_APP_NAME, data.getString("appName"));
         }
 
         if (type.equals(RCTQQShareTypeNews)) {
-            bundle.putInt(
-                    QQShare.SHARE_TO_QQ_KEY_TYPE,
-                    QQShare.SHARE_TO_QQ_TYPE_DEFAULT
-            );
+            bundle.putInt(QQShare.SHARE_TO_QQ_KEY_TYPE, QQShare.SHARE_TO_QQ_TYPE_DEFAULT);
         } else if (type.equals(RCTQQShareTypeImage)) {
             String image = data.getString(RCTQQShareImageUrl);
             if (image.startsWith("content://") || image.startsWith("file://")) {
                 image = getImageAbsolutePath(getCurrentActivity(), Uri.parse(image));
             }
 
-            bundle.putInt(
-                    QQShare.SHARE_TO_QQ_KEY_TYPE,
-                    QQShare.SHARE_TO_QQ_TYPE_IMAGE
-            );
+            bundle.putInt(QQShare.SHARE_TO_QQ_KEY_TYPE, QQShare.SHARE_TO_QQ_TYPE_IMAGE);
             bundle.putString(QQShare.SHARE_TO_QQ_IMAGE_LOCAL_URL, image);
             bundle.putString(QQShare.SHARE_TO_QQ_IMAGE_URL, image);
         } else if (type.equals(RCTQQShareTypeAudio)) {
-            bundle.putInt(
-                    QQShare.SHARE_TO_QQ_KEY_TYPE,
-                    QQShare.SHARE_TO_QQ_TYPE_AUDIO
-            );
+            bundle.putInt(QQShare.SHARE_TO_QQ_KEY_TYPE, QQShare.SHARE_TO_QQ_TYPE_AUDIO);
             if (data.hasKey("flashUrl")) {
-                bundle.putString(
-                        QQShare.SHARE_TO_QQ_AUDIO_URL,
-                        data.getString("flashUrl")
-                );
+                bundle.putString(QQShare.SHARE_TO_QQ_AUDIO_URL, data.getString("flashUrl"));
             }
         } else if (type.equals("app")) {
             // TODO: 腾讯SDK 3.5.2.15 弃用了分享APP功能
@@ -272,25 +249,17 @@ public class QqOpenSdkModule extends ReactContextBaseJavaModule implements Activ
 
         if (scene == 0) {
             // Share to QQ.
-            bundle.putInt(
-                    QQShare.SHARE_TO_QQ_EXT_INT,
-                    QQShare.SHARE_TO_QQ_FLAG_QZONE_ITEM_HIDE
-            );
+            bundle.putInt(QQShare.SHARE_TO_QQ_EXT_INT, QQShare.SHARE_TO_QQ_FLAG_QZONE_ITEM_HIDE);
             mTencent.shareToQQ(getCurrentActivity(), bundle, shareListener);
         } else if (scene == 1) {
             // Share to Qzone.
-            bundle.putInt(
-                    QQShare.SHARE_TO_QQ_EXT_INT,
-                    QQShare.SHARE_TO_QQ_FLAG_QZONE_AUTO_OPEN
-            );
+            bundle.putInt(QQShare.SHARE_TO_QQ_EXT_INT, QQShare.SHARE_TO_QQ_FLAG_QZONE_AUTO_OPEN);
             mTencent.shareToQQ(getCurrentActivity(), bundle, shareListener);
         }
     }
 
     private void resolvePromise(ReadableMap resultMap) {
-        getReactApplicationContext()
-                .getJSModule(RCTNativeAppEventEmitter.class)
-                .emit("QQ_Resp", resultMap);
+        appEventEmitter.emit("QQ_Resp", resultMap);
     }
 
     public static String getImageAbsolutePath(Activity context, Uri imageUri) {
@@ -413,12 +382,12 @@ public class QqOpenSdkModule extends ReactContextBaseJavaModule implements Activ
                 resultMap.putString("access_token", obj.getString(Constants.PARAM_ACCESS_TOKEN));
                 resultMap.putString("oauth_consumer_key", appId);
                 resultMap.putDouble("expires_in", (new Date().getTime() + obj.getLong(Constants.PARAM_EXPIRES_IN)));
-                eventEmitter.emit("QQ_Resp", resultMap);
+                appEventEmitter.emit("QQ_Resp", resultMap);
             } catch (Exception e) {
                 WritableMap map = Arguments.createMap();
                 map.putInt("errCode", Constants.ERROR_UNKNOWN);
                 map.putString("errMsg", e.getLocalizedMessage());
-                eventEmitter.emit("QQ_Resp", map);
+                appEventEmitter.emit("QQ_Resp", map);
             }
         }
 
@@ -428,7 +397,7 @@ public class QqOpenSdkModule extends ReactContextBaseJavaModule implements Activ
             resultMap.putInt("errCode", SHARE_RESULT_CODE_FAILED);
             resultMap.putString("message", "Share failed." + uiError.errorDetail);
 
-            eventEmitter.emit("QQ_Resp", resultMap);
+            appEventEmitter.emit("QQ_Resp", resultMap);
         }
 
         @Override
@@ -437,7 +406,7 @@ public class QqOpenSdkModule extends ReactContextBaseJavaModule implements Activ
             resultMap.putInt("errCode", SHARE_RESULT_CODE_CANCEL);
             resultMap.putString("message", "Share canceled.");
 
-            eventEmitter.emit("QQ_Resp", resultMap);
+            appEventEmitter.emit("QQ_Resp", resultMap);
         }
 
         @Override
@@ -455,6 +424,7 @@ public class QqOpenSdkModule extends ReactContextBaseJavaModule implements Activ
         if (mTencent != null) {
             mTencent = null;
             eventEmitter = null;
+            appEventEmitter = null;
         }
         getReactApplicationContext().removeActivityEventListener(this);
         super.onCatalystInstanceDestroy();
