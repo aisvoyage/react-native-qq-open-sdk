@@ -413,13 +413,12 @@ public class QqOpenSdkModule extends ReactContextBaseJavaModule implements Activ
                 resultMap.putString("access_token", obj.getString(Constants.PARAM_ACCESS_TOKEN));
                 resultMap.putString("oauth_consumer_key", appId);
                 resultMap.putDouble("expires_in", (new Date().getTime() + obj.getLong(Constants.PARAM_EXPIRES_IN)));
-                getReactApplicationContext().getJSModule(RCTNativeAppEventEmitter.class).emit("QQ_Resp", resultMap);
+                eventEmitter.emit("QQ_Resp", resultMap);
             } catch (Exception e) {
                 WritableMap map = Arguments.createMap();
                 map.putInt("errCode", Constants.ERROR_UNKNOWN);
                 map.putString("errMsg", e.getLocalizedMessage());
-
-                getReactApplicationContext().getJSModule(RCTNativeAppEventEmitter.class).emit("QQ_Resp", map);
+                eventEmitter.emit("QQ_Resp", map);
             }
         }
 
@@ -429,9 +428,7 @@ public class QqOpenSdkModule extends ReactContextBaseJavaModule implements Activ
             resultMap.putInt("errCode", SHARE_RESULT_CODE_FAILED);
             resultMap.putString("message", "Share failed." + uiError.errorDetail);
 
-            getReactApplicationContext()
-                    .getJSModule(RCTNativeAppEventEmitter.class)
-                    .emit("QQ_Resp", resultMap);
+            eventEmitter.emit("QQ_Resp", resultMap);
         }
 
         @Override
@@ -440,9 +437,7 @@ public class QqOpenSdkModule extends ReactContextBaseJavaModule implements Activ
             resultMap.putInt("errCode", SHARE_RESULT_CODE_CANCEL);
             resultMap.putString("message", "Share canceled.");
 
-            getReactApplicationContext()
-                    .getJSModule(RCTNativeAppEventEmitter.class)
-                    .emit("QQ_Resp", resultMap);
+            eventEmitter.emit("QQ_Resp", resultMap);
         }
 
         @Override
