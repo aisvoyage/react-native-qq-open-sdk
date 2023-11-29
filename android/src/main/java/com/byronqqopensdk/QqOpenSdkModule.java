@@ -60,8 +60,8 @@ public class QqOpenSdkModule extends ReactContextBaseJavaModule implements Activ
     private static final String RCTQQShareText = "text";
     private static final String RCTQQShareTitle = "title";
     private static final String RCTQQShareDescription = "description";
-    private static final String RCTQQShareWebpageUrl = "webpageUrl";
-    private static final String RCTQQShareImageUrl = "imageUrl";
+    private static final String RCTQQShareWebpageUrl = "url";
+    private static final String RCTQQShareImageUrl = "preImage";
 
     private static final int SHARE_RESULT_CODE_SUCCESSFUL = 0;
     private static final int SHARE_RESULT_CODE_FAILED = 1;

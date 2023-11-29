@@ -94,9 +94,9 @@ export default class QQOpenSDK {
         reject('share news url length invalid');
       }
       if (scene === 0) {
-        return QqOpenSdk.shareToQQ({type: 'news', title, description, imageUrl: preImage, webpageUrl: url});
+        return QqOpenSdk.shareToQQ({type: 'news', title, description, preImage, url});
       } else {
-        return QqOpenSdk.shareToQZone({type: 'news', title, description, imageUrl: preImage, webpageUrl: url});
+        return QqOpenSdk.shareToQZone({type: 'news', title, description, preImage, url});
       }
     });
   };
