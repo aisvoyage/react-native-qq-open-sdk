@@ -44,7 +44,7 @@ import java.util.Date;
 public class QqOpenSdkModule extends ReactContextBaseJavaModule implements ActivityEventListener {
 
     private final ReactApplicationContext reactContext;
-    public DeviceEventManagerModule.RCTDeviceEventEmitter eventEmitter;
+    //public DeviceEventManagerModule.RCTDeviceEventEmitter eventEmitter;
     public RCTNativeAppEventEmitter appEventEmitter;
     private Tencent mTencent;
 
@@ -85,7 +85,7 @@ public class QqOpenSdkModule extends ReactContextBaseJavaModule implements Activ
         }
         Tencent.setIsPermissionGranted(true);
         mTencent = Tencent.createInstance(appId, reactContext);
-        eventEmitter = reactContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class);
+        //eventEmitter = reactContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class);
         appEventEmitter = reactContext.getJSModule(RCTNativeAppEventEmitter.class);
         this.appId = appId;
     }
@@ -134,7 +134,7 @@ public class QqOpenSdkModule extends ReactContextBaseJavaModule implements Activ
         }
         mTencent.logout(reactContext);
         mTencent = null;
-        eventEmitter = null;
+        //eventEmitter = null;
     }
 
     @ReactMethod
@@ -425,7 +425,7 @@ public class QqOpenSdkModule extends ReactContextBaseJavaModule implements Activ
     public void onCatalystInstanceDestroy() {
         if (mTencent != null) {
             mTencent = null;
-            eventEmitter = null;
+            //eventEmitter = null;
             appEventEmitter = null;
         }
         getReactApplicationContext().removeActivityEventListener(this);
@@ -448,12 +448,12 @@ public class QqOpenSdkModule extends ReactContextBaseJavaModule implements Activ
                 data.putDouble("expirationDate", (new Date().getTime() + obj.getLong(Constants.PARAM_EXPIRES_IN)));
                 data.putString("openId", obj.getString(Constants.PARAM_OPEN_ID));
                 data.putString("unionid", "");
-                eventEmitter.emit("QQ_LOGIN", data);
+                appEventEmitter.emit("QQ_LOGIN", data);
             } catch (Exception e) {
                 WritableMap data = Arguments.createMap();
                 data.putBoolean("cancelled", false);
                 data.putString("error", e.getLocalizedMessage());
-                eventEmitter.emit("QQ_LOGIN", data);
+                appEventEmitter.emit("QQ_LOGIN", data);
             }
         }
 
@@ -462,7 +462,7 @@ public class QqOpenSdkModule extends ReactContextBaseJavaModule implements Activ
             WritableMap data = Arguments.createMap();
             data.putBoolean("cancelled", false);
             data.putString("error", uiError.errorMessage);
-            eventEmitter.emit("QQ_LOGIN", data);
+            appEventEmitter.emit("QQ_LOGIN", data);
         }
 
         @Override
@@ -470,14 +470,14 @@ public class QqOpenSdkModule extends ReactContextBaseJavaModule implements Activ
             WritableMap data = Arguments.createMap();
             data.putBoolean("cancelled", true);
             data.putString("error", "Cancel login");
-            eventEmitter.emit("QQ_LOGIN", data);
+            appEventEmitter.emit("QQ_LOGIN", data);
         }
 
         @Override
         public void onWarning(int i) {
             WritableMap data = Arguments.createMap();
             data.putString("error", "Warning login");
-            eventEmitter.emit("QQ_LOGIN", data);
+            appEventEmitter.emit("QQ_LOGIN", data);
         }
     };
 }
