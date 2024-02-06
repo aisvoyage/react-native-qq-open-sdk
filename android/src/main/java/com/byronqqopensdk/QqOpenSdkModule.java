@@ -155,6 +155,24 @@ public class QqOpenSdkModule extends ReactContextBaseJavaModule implements Activ
         );
     }
 
+    @ReactMethod
+    public void shareToQZone(final ReadableMap data, final Promise promise) {
+        if (mTencent == null) {
+            promise.reject(NOT_INIT);
+            return;
+        }
+
+        UiThreadUtil.runOnUiThread(
+                new Runnable() {
+                    @Override
+                    public void run() {
+                        _shareToQQ(data, 1);
+                        promise.resolve(true);
+                    }
+                }
+        );
+    }
+
     private void _shareToQQ(ReadableMap data, int scene) {
     Log.e("QQShare==", "进入方法_shareToQQ");
         String type = RCTQQShareTypeNews;
